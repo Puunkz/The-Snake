@@ -1,13 +1,16 @@
 ﻿using Raylib_cs;
 using The_Snake.Core;
 using The_Snake.Scenes;
+using The_Snake.Services;
 
 class Program
 {
     static void Main()
     {
-        Raylib.InitWindow(1920, 1080, "Snake Game");
+        Raylib.InitWindow(800, 600, "Snake Game");
         Raylib.SetTargetFPS(60);
+        
+        ServiceLocator.Register<IInputService>(new InputService());
 
         SceneManager.ChangeScene(new MenuScene());
 

@@ -1,5 +1,6 @@
 using Raylib_cs;
 using The_Snake.Core;
+using The_Snake.Services;
 
 namespace The_Snake.Scenes;
 
@@ -12,6 +13,8 @@ public class MenuScene : IScene
 
     public void Update()
     {
+        var input = ServiceLocator.Get<IInputService>();
+        
         if (Raylib.IsKeyPressed(KeyboardKey.Enter))
         {
             SceneManager.ChangeScene(new GameScene());

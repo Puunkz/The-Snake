@@ -1,6 +1,7 @@
-﻿namespace The_Snake.Core.IServices;
+﻿namespace The_Snake.Services;
 
-public class IInputService
+public interface IInputService
 {
-    
+    bool IsPausePressed();
+    bool IsStartPressed();
 }
