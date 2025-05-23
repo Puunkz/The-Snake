@@ -1,27 +1,26 @@
 using Raylib_cs;
-using The_Snake.Gameplay;
-using System.Numerics;
+using The_Snake.Entities;
 
 namespace The_Snake.Scenes;
 public class GameScene : IScene
 {
-    private Snake snake = new ();
-    private Apple apple = new ();
+    private Snake _snake = new ();
+    private Apple _apple = new ();
     
     public void Load()
     {
-        snake = new Snake();
-        apple = new Apple();
+        _snake = new Snake();
+        _apple = new Apple();
     }
 
     public void Update()
     {
-        snake.Update();
+        _snake.Update();
 
-        if (snake.IsHeadOn(apple.Position))
+        if (_snake.IsHeadOn(_apple.Position))
         {
-            snake.Grow();
-            apple.Respawn();
+            _snake.Grow();
+            _apple.Respawn();
         }
         
         if (Raylib.IsKeyPressed(KeyboardKey.Escape))
@@ -32,8 +31,8 @@ public class GameScene : IScene
 
     public void Draw()
     {
-        snake.Draw();
-        apple.Draw();
+        _snake.Draw();
+        _apple.Draw();
     }
     public void Unload()
     {

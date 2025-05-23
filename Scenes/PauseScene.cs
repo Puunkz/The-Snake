@@ -1,6 +1,5 @@
 using Raylib_cs;
 using The_Snake.Core;
-using The_Snake.Scenes;
 
 namespace The_Snake.Scenes;
 

@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using The_Snake.Core;
 
-namespace The_Snake.Gameplay;
+namespace The_Snake.Utils;
 
 public static class Grid
 {
@@ -12,7 +12,7 @@ public static class Grid
 
     public static bool IsInsideGrid(Vector2 pos)
     {
-        return pos.X >= 0 && pos.X < GameConfig.GridWidth &&
-               pos.Y >= 0 && pos.Y < GameConfig.GridHeight;
+        return !(!(pos.X >= 0) || !(pos.X < GameConfig.GridWidth) ||
+                 !(pos.Y >= 0) || !(pos.Y < GameConfig.GridHeight));
     }
 }

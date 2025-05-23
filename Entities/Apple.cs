@@ -1,13 +1,14 @@
 ﻿using System.Numerics;
 using Raylib_cs;
 using The_Snake.Core;
+using The_Snake.Utils;
 
-namespace The_Snake.Gameplay;
+namespace The_Snake.Entities;
 
 public class Apple
 {
     public Vector2 Position;
-    private Random random = new();
+    private Random _random = new();
 
     public Apple()
     {
@@ -17,8 +18,8 @@ public class Apple
     public void Respawn()
     {
         Position = new Vector2(
-            random.Next(0, GameConfig.GridWidth),
-            random.Next(0, GameConfig.GridHeight)
+            _random.Next(0, GameConfig.GridWidth),
+            _random.Next(0, GameConfig.GridHeight)
             );
     }
 
