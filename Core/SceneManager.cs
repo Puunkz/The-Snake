@@ -3,7 +3,7 @@ namespace The_Snake.Core;
 
 public static class SceneManager
 {
-    private static IScene currentScene;
+    private static IScene? currentScene;
     public static void ChangeScene(IScene newScene)
     {
         currentScene?.Unload();

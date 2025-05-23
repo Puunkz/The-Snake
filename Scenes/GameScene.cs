@@ -1,25 +1,39 @@
 using Raylib_cs;
-using The_Snake.Scenes;
-using The_Snake.Core;
+using The_Snake.Gameplay;
+using System.Numerics;
 
+namespace The_Snake.Scenes;
 public class GameScene : IScene
 {
+    private Snake snake = new ();
+    private Apple apple = new ();
+    
     public void Load()
     {
-        // Load resources for the game scene here
+        snake = new Snake();
+        apple = new Apple();
     }
 
     public void Update()
     {
+        snake.Update();
+
+        if (snake.IsHeadOn(apple.Position))
+        {
+            snake.Grow();
+            apple.Respawn();
+        }
+        
         if (Raylib.IsKeyPressed(KeyboardKey.Escape))
         {
-            SceneManager.ChangeScene(new PauseScene());
+            
         }
     }
 
     public void Draw()
     {
-        Raylib.DrawText("Jeu en cours...", 10, 10, 20, Color.White);
+        snake.Draw();
+        apple.Draw();
     }
     public void Unload()
     {
