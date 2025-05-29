@@ -22,7 +22,11 @@ namespace TheSnake.Scenes
         public void Load()
         {
             _snake.Clear();
-            _snake.Add(new SnakeSegment(new Vector2(_gridWidth / 2, _gridHeight / 2)));
+            
+            Vector2 head = new(_gridWidth / 2, _gridHeight / 2);
+            _snake.Add(new SnakeSegment(head));
+            _snake.Add(new SnakeSegment(head - new Vector2(1, 0)));
+            _snake.Add(new SnakeSegment(head - new Vector2(2, 0)));
             
             SpawnFruit();
 

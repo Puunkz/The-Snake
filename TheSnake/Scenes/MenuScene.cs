@@ -19,8 +19,8 @@ namespace TheSnake.Scenes
         
         public void Draw()
         {
-            Raylib.DrawText("Welcome to The Snake!", 350, 200, 40, Color.WHITE);
-            Raylib.DrawText("Press Enter to Start", 240, 300, 20, Color.LIGHTGRAY);
+            Raylib.DrawText("Welcome to The Snake!", 200, 200, 40, Color.WHITE);
+            Raylib.DrawText("Press Enter to Start", 200, 300, 20, Color.LIGHTGRAY);
         }
         
         public void Unload()

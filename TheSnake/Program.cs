@@ -22,7 +22,7 @@ namespace TheSnake
                 SceneManager.Update(dt);
                 
                 Raylib.BeginDrawing();
-                Raylib.ClearBackground(Color.BLACK);
+                Raylib.ClearBackground(Color.GRAY);
                 SceneManager.Draw();
                 Raylib.EndDrawing();
             }
