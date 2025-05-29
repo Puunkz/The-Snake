@@ -2,23 +2,23 @@
 {
     public static class SceneManager
     {
-        private static IScene? currentScene;
+        private static IScene? _currentScene;
         
         public static void ChangeScene(IScene newScene)
         {
-            currentScene?.unload();
-            currentScene = newScene;
-            currentScene.load();
+            _currentScene?.Unload();
+            _currentScene = newScene;
+            _currentScene.Load();
         }
         
         public static void Update(float deltaTime)
         {
-            currentScene?.update(deltaTime);
+            _currentScene?.Update(deltaTime);
         }
 
         public static void Draw()
         {
-            currentScene?.draw();
+            _currentScene?.Draw();
         }
     }  
 }

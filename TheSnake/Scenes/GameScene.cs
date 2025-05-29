@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
+﻿using System.Numerics;
 using Raylib_cs;
 using TheSnake.Core;
 using TheSnake.Entities;
@@ -10,128 +8,136 @@ namespace TheSnake.Scenes
 {
     public class GameScene : IScene
     {
-        private List<SnakeSegmment> snake = new();
-        private Fruit fruit;
-        private Vector2 direction = new(1, 0);
-        private float moveTimer = 0f;
+        private readonly List<SnakeSegment> _snake = new();
+        private Fruit _fruit;
+        private Vector2 _direction = new(1, 0);
+        private float _moveTimer = 0f;
         private const float MoveInterval = 0.2f; // Intervalle de temps entre les mouvements
-        private bool growNextMove = false;
         
-        private int gridWidth = 40;
-        private int gridHeight = 30;
-        
-        private IInputService inputService;
+        private bool _growNextMove = false;
+        private readonly int _gridWidth = 40;
+        private readonly int _gridHeight = 30;
+        private IInputService _inputService;
 
-        public void load()
+        public void Load()
         {
-            snake.Clear();
-            snake.Add(new SnakeSegmment(new Vector2(gridWidth / 2, gridHeight / 2)));
+            _snake.Clear();
+            _snake.Add(new SnakeSegment(new Vector2(_gridWidth / 2, _gridHeight / 2)));
             
             SpawnFruit();
 
-            inputService = ServiceLocator.Get<IInputService>();
-            direction = new Vector2(1, 0);
-            moveTimer = 0f;
-            growNextMove = false;
+            _inputService = ServiceLocator.Get<IInputService>();
+            _direction = new Vector2(1, 0);
+            _moveTimer = 0f;
+            _growNextMove = false;
         }
 
         public void Update(float deltaTime)
         {
             HandleInput();
-            moveTimer += deltaTime;
+            _moveTimer += deltaTime;
 
-            if (moveTimer >= MoveInterval)
+            if (_moveTimer >= MoveInterval)
             {
-                moveTimer = 0f;
+                _moveTimer = 0f;
                 MoveSnake();
             }
         }
 
+        public void Draw()
+        {
+            foreach (var segment in _snake)
+            {
+                segment.Draw();
+            }
+            
+            _fruit.Draw();
+            Raylib.DrawText($"Score: {_snake.Count - 1}", 10, 10, 20, Color.WHITE);
+        }
+
+        public void Unload()
+        {
+            _snake.Clear();
+        }
+
         private void HandleInput()
         {
-            Vector2 inputDir = inputService.GetDirection();
-            if (inputDir == Vector2.Zero)
+            Vector2 inputDir = _inputService.GetDirection();
+            if (inputDir != Vector2.Zero)
             {
-                if (snake.Count > 1)
+                if (_snake.Count > 1)
                 {
-                    Vector2 opposite = -direction;
+                    Vector2 opposite = -_direction;
                     if (inputDir != opposite)
                     {
-                        direction = inputDir;
+                        _direction = inputDir;
                     }
                 }
                 else
                 {
-                    direction = inputDir;
+                    _direction = inputDir;
                 }
             }
         }
-    }
-    
-    private void MoveSnake()
-    {
-        Vector2 newHeadPos = snake[0].Position + direction;
         
-        if (newHeadPos.X < 0 ) newHeadPos.X = gridWidth - 1;
-        if (newHeadPos.X >= gridWidth) newHeadPos.X = 0;
-        if (newHeadPos.Y < 0) newHeadPos.Y = gridHeight - 1;
-        if (newHeadPos.Y >= gridHeight) newHeadPos.Y = 0;
-
-        foreach (var segment in snake)
+        private void MoveSnake()
         {
-            if (segment.Postition == newHeadPos)
+            Vector2 newHeadPos = _snake[0].Position + _direction;
+        
+            if (newHeadPos.X < 0 ) newHeadPos.X = _gridWidth - 1;
+            if (newHeadPos.X >= _gridWidth) newHeadPos.X = 0;
+            if (newHeadPos.Y < 0) newHeadPos.Y = _gridHeight - 1;
+            if (newHeadPos.Y >= _gridHeight) newHeadPos.Y = 0;
+
+            foreach (var segment in _snake)
             {
-                SceneManager.ChangeScene(new MenuScene());
-                return; // Collision avec le corps du serpent, fin du jeu
+                if (segment.Position == newHeadPos)
+                {
+                    SceneManager.ChangeScene(new MenuScene());
+                    return; // Collision avec le corps du serpent, fin du jeu
+                }
+            }
+        
+            _snake.Insert(0, new SnakeSegment(newHeadPos));
+
+            if (_growNextMove)
+            {
+                _growNextMove = false; // Réinitialiser le flag de croissance
+            }
+        
+            else
+            {
+                _snake.RemoveAt(_snake.Count - 1); // Retirer la dernière segment si pas de croissance
+            }
+
+            if (newHeadPos == _fruit.Position)
+            {
+                _growNextMove = true; // Prochain mouvement, le serpent grandit
+                SpawnFruit();
             }
         }
-        
-        snake.Insert(0, new SnakeSegmment(newHeadPos));
 
-        if (growNextMove)
+        private void SpawnFruit()
         {
-            growNextMove = false; // Réinitialiser le flag de croissance
+            Random rnd = new();
+
+            Vector2 pos;
+            do
+            {
+                pos = new Vector2(rnd.Next(0, _gridWidth), rnd.Next(0, _gridHeight));
+            }
+            while (IsPositionOnSnake(pos));
+            _fruit = new Fruit(pos);
         }
-        
-        else
+
+        private bool IsPositionOnSnake(Vector2 pos)
         {
-            snake.RemoveAt(snake.Count - 1); // Retirer la dernière segment si pas de croissance
+            foreach (var segment in _snake)
+            {
+                if (segment.Position == pos) return true;
+            }
+            return false;
         }
-
-        if (newHeadPos == fruit.postition)
-        {
-            growNextMove = true; // Prochain mouvement, le serpent grandit
-            SpawnFruit();
-        }
-    }
-
-    private void SpawnFruit()
-    {
-        Random rnd = new();
-
-        Vector2 pos;
-        do
-        {
-            pos = new Vector2(rnd.Next(0, gridWidth), rnd.Next(0, gridHeight));
-        }
-        while (IsPositionOnSnake(pos));
-        fruit = new Fruit(pos);
-    }
-
-    private bool IsPositionOnSnake(Vector2 pos)
-    {
-        foreach (var segment in snake)
-        {
-            segment.Draw();
-        }
-        
-        fruit.Draw();
-        Raylib.DrawText($"Score: {snake.Count - 1}", 10, 10, 20, Color.WHITE);
-    }
-
-    public void Unload()
-    {
-        snake.Clear();
     }
 }
 

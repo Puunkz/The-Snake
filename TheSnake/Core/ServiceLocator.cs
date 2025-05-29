@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TheSnake.Core
+﻿namespace TheSnake.Core
 {
     public static class ServiceLocator
     {
-        private static readonly Dictionary<Type, object> services = new();
+        private static readonly Dictionary<Type, object> Services = new();
 
         public static void Register<T>(T service)
         {
-            services[typeof(T)] = service;
+            Services[typeof(T)] = service;
         }
 
         public static T Get<T>()
         {
-            if (services.TryGetValue(typeof(T), out var service))
+            if (Services.TryGetValue(typeof(T), out var service))
             {
                 return (T)service;
             }

@@ -11,7 +11,7 @@ namespace TheSnake.Input
             if (Raylib.IsKeyDown(KeyboardKey.KEY_DOWN)) return new Vector2(0, 1);
             if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT)) return new Vector2(-1, 0);
             if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT)) return new Vector2(1, 0);
-            return Vector2.Zero; //aucune direction
+            return Vector2.Zero;
         }
     }
 }

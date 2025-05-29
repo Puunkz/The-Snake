@@ -6,7 +6,7 @@ namespace TheSnake.Entities
 {
     public class SnakeSegment : GameObject
     {
-        private const int CellsSize = 20; // Taille d'une cellule du serpent
+        private const int CellsSize = 20; // Taille des cellules du serpent
         public SnakeSegment(Vector2 position) : base(position)
         {
         }

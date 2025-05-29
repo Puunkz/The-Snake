@@ -2,12 +2,12 @@
 {
     public interface IScene
     {
-        void load();
+        void Load();
         
-        void update(float deltaTime);
+        void Update(float deltaTime);
         
-        void draw();
+        void Draw();
         
-        void unload();
+        void Unload();
     }
 }
