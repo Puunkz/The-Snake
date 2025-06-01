@@ -19,21 +19,33 @@ namespace TheSnake.Scenes
         private readonly int _gridHeight = 30;
         private IInputService _inputService;
 
+        private readonly List<Vector2> _obstacles = new();
+        private int _score = 0;
+
         public void Load()
         {
-            _snake.Clear();
-            
-            Vector2 head = new(_gridWidth / 2, _gridHeight / 2);
-            _snake.Add(new SnakeSegment(head));
-            _snake.Add(new SnakeSegment(head - new Vector2(1, 0)));
-            _snake.Add(new SnakeSegment(head - new Vector2(2, 0)));
-            
-            SpawnFruit();
+            try
+            {
+                _snake.Clear();
 
-            _inputService = ServiceLocator.Get<IInputService>();
-            _direction = new Vector2(1, 0);
-            _moveTimer = 0f;
-            _growNextMove = false;
+                var headPos = new Vector2(_gridWidth / 2, _gridHeight / 2);
+                _snake.Add(new SnakeSegment(headPos));
+                _snake.Add(new SnakeSegment(headPos - new Vector2(1, 0)));
+                _snake.Add(new SnakeSegment(headPos - new Vector2(2, 0)));
+
+                _inputService = ServiceLocator.Get<IInputService>();
+                _direction = new Vector2(1, 0);
+                _moveTimer = 0f;
+                _growNextMove = false;
+                _score = 0;
+                _obstacles.Clear();
+
+                SpawnFruit();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"(GameScene Load Error): {ex.Message}\n{ex.StackTrace}");
+            }
         }
 
         public void Update(float deltaTime)
@@ -55,8 +67,13 @@ namespace TheSnake.Scenes
                 segment.Draw();
             }
             
-            _fruit.Draw();
-            Raylib.DrawText($"Score: {_snake.Count - 1}", 10, 10, 20, Color.WHITE);
+            foreach (var obstacle in _obstacles)
+            {
+                Raylib.DrawRectangle((int)(obstacle.X * 20), (int)(obstacle.Y * 20), 20, 20, Color.BLUE);
+            }
+            
+            _fruit?.Draw();
+            Raylib.DrawText($"Score: {_snake.Count - 3}", 10, 10, 20, Color.WHITE);
         }
 
         public void Unload()
@@ -102,21 +119,33 @@ namespace TheSnake.Scenes
                 }
             }
         
+            foreach (var obs in _obstacles){
+                if (obs == newHeadPos)
+                {
+                    SceneManager.ChangeScene(new MenuScene());
+                    return; // Collision avec un obstacle, fin du jeu
+                }
+            }
+            
             _snake.Insert(0, new SnakeSegment(newHeadPos));
 
             if (_growNextMove)
             {
-                _growNextMove = false; // Réinitialiser le flag de croissance
+                _growNextMove = false;
             }
-        
             else
             {
-                _snake.RemoveAt(_snake.Count - 1); // Retirer la dernière segment si pas de croissance
+                _snake.RemoveAt(_snake.Count - 1);
             }
 
             if (newHeadPos == _fruit.Position)
             {
-                _growNextMove = true; // Prochain mouvement, le serpent grandit
+                _growNextMove = true;
+                _score++;
+                if (_score % 5 == 0)
+                {
+                    AddRandomObstacle();
+                }
                 SpawnFruit();
             }
         }
@@ -124,14 +153,28 @@ namespace TheSnake.Scenes
         private void SpawnFruit()
         {
             Random rnd = new();
-
             Vector2 pos;
+            
             do
             {
                 pos = new Vector2(rnd.Next(0, _gridWidth), rnd.Next(0, _gridHeight));
             }
-            while (IsPositionOnSnake(pos));
+            while (IsPositionOnSnake(pos) || _obstacles.Contains(pos));
+
             _fruit = new Fruit(pos);
+        }
+
+        private void AddRandomObstacle()
+        {
+            Random rnd = new();
+            Vector2 pos;
+
+            do
+            {
+                pos = new Vector2(rnd.Next(0, _gridWidth), rnd.Next(0, _gridHeight));
+            }
+            while (IsPositionOnSnake(pos) || pos == _fruit.Position || _obstacles.Contains(pos));
+            _obstacles.Add(pos);
         }
 
         private bool IsPositionOnSnake(Vector2 pos)
