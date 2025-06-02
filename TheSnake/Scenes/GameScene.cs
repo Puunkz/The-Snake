@@ -6,27 +6,27 @@ using TheSnake.Input;
 
 namespace TheSnake.Scenes
 {
-    public class GameScene : IScene
+    public class GameScene : IScene 
     {
-        private readonly List<SnakeSegment> _snake = new();
-        private Fruit _fruit;
-        private Vector2 _direction = new(1, 0);
-        private float _moveTimer = 0f;
+        private readonly List<SnakeSegment> _snake = new(); 
+        private Fruit _fruit; 
+        private Vector2 _direction = new(1, 0); // Direction initiale du serpent (vers la droite)
+        private float _moveTimer = 0f; 
         private const float MoveInterval = 0.2f; // Intervalle de temps entre les mouvements
         
-        private bool _growNextMove = false;
-        private readonly int _gridWidth = 40;
+        private bool _growNextMove = false;  
+        private readonly int _gridWidth = 40; 
         private readonly int _gridHeight = 30;
-        private IInputService _inputService;
+        private IInputService _inputService; 
 
-        private readonly List<Vector2> _obstacles = new();
-        private int _score = 0;
+        private readonly List<Vector2> _obstacles = new(); 
+        private int _score = 0; 
 
-        public void Load()
+        public void Load() 
         {
-            try
+            try 
             {
-                _snake.Clear();
+                _snake.Clear(); 
 
                 var headPos = new Vector2(_gridWidth / 2, _gridHeight / 2);
                 _snake.Add(new SnakeSegment(headPos));
@@ -48,12 +48,12 @@ namespace TheSnake.Scenes
             }
         }
 
-        public void Update(float deltaTime)
+        public void Update(float deltaTime)  
         {
-            HandleInput();
+            HandleInput(); 
             _moveTimer += deltaTime;
 
-            if (_moveTimer >= MoveInterval)
+            if (_moveTimer >= MoveInterval) 
             {
                 _moveTimer = 0f;
                 MoveSnake();
@@ -62,7 +62,7 @@ namespace TheSnake.Scenes
 
         public void Draw()
         {
-            foreach (var segment in _snake)
+            foreach (var segment in _snake) // Dessine chaque segment du serpent
             {
                 segment.Draw();
             }
@@ -73,7 +73,7 @@ namespace TheSnake.Scenes
             }
             
             _fruit?.Draw();
-            Raylib.DrawText($"Score: {_snake.Count - 3}", 10, 10, 20, Color.WHITE);
+            Raylib.DrawText($"Score: {_snake.Count - 3}", 10, 10, 20, Color.WHITE); // Affiche le score
         }
 
         public void Unload()
@@ -103,7 +103,7 @@ namespace TheSnake.Scenes
         
         private void MoveSnake()
         {
-            Vector2 newHeadPos = _snake[0].Position + _direction;
+            Vector2 newHeadPos = _snake[0].Position + _direction; 
         
             if (newHeadPos.X < 0 ) newHeadPos.X = _gridWidth - 1;
             if (newHeadPos.X >= _gridWidth) newHeadPos.X = 0;
@@ -129,7 +129,7 @@ namespace TheSnake.Scenes
             
             _snake.Insert(0, new SnakeSegment(newHeadPos));
 
-            if (_growNextMove)
+            if (_growNextMove) // Si le serpent doit grandir
             {
                 _growNextMove = false;
             }
@@ -138,7 +138,7 @@ namespace TheSnake.Scenes
                 _snake.RemoveAt(_snake.Count - 1);
             }
 
-            if (newHeadPos == _fruit.Position)
+            if (newHeadPos == _fruit.Position) // Si le serpent mange le fruit
             {
                 _growNextMove = true;
                 _score++;
@@ -150,11 +150,12 @@ namespace TheSnake.Scenes
             }
         }
 
-        private void SpawnFruit()
+        private void SpawnFruit() 
         {
             Random rnd = new();
             Vector2 pos;
             
+            // Génère une position aléatoire pour le fruit
             do
             {
                 pos = new Vector2(rnd.Next(0, _gridWidth), rnd.Next(0, _gridHeight));
@@ -164,7 +165,7 @@ namespace TheSnake.Scenes
             _fruit = new Fruit(pos);
         }
 
-        private void AddRandomObstacle()
+        private void AddRandomObstacle() // Ajoute un obstacle aléatoire sur la grille
         {
             Random rnd = new();
             Vector2 pos;
@@ -173,11 +174,11 @@ namespace TheSnake.Scenes
             {
                 pos = new Vector2(rnd.Next(0, _gridWidth), rnd.Next(0, _gridHeight));
             }
-            while (IsPositionOnSnake(pos) || pos == _fruit.Position || _obstacles.Contains(pos));
+            while (IsPositionOnSnake(pos) || pos == _fruit.Position || _obstacles.Contains(pos)); // Assure que l'obstacle n'est pas sur le serpent, le fruit ou déjà un obstacle
             _obstacles.Add(pos);
         }
 
-        private bool IsPositionOnSnake(Vector2 pos)
+        private bool IsPositionOnSnake(Vector2 pos) // Vérifie si une position est occupée par le serpent
         {
             foreach (var segment in _snake)
             {

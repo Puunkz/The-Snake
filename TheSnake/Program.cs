@@ -16,7 +16,7 @@ namespace TheSnake
             
             SceneManager.ChangeScene(new MenuScene());
 
-            while (!Raylib.WindowShouldClose())
+            while (!Raylib.WindowShouldClose()) // Main game loop
             {
                 float dt = Raylib.GetFrameTime();
                 SceneManager.Update(dt);

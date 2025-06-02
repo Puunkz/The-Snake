@@ -1,12 +1,12 @@
 ﻿namespace TheSnake.Core
 {
-    public static class ServiceLocator
+    public static class ServiceLocator 
     {
         private static readonly Dictionary<Type, object> Services = new();
 
         public static void Register<T>(T service)
         {
-            Services[typeof(T)] = service;
+            if (service != null) Services[typeof(T)] = service;
         }
 
         public static T Get<T>()

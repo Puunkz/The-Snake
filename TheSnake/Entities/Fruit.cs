@@ -4,12 +4,9 @@ using Raylib_cs;
 
 namespace TheSnake.Entities
 {
-    public class Fruit : GameObject
+    public class Fruit(Vector2 position) : GameObject(position)
     {
         private const int CellsSize = 20;
-        public Fruit(Vector2 position) : base(position)
-        {
-        }
 
         public override void Update(float deltaTime)
         {

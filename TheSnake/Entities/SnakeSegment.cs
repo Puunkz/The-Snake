@@ -4,12 +4,10 @@ using Raylib_cs;
 
 namespace TheSnake.Entities
 {
-    public class SnakeSegment : GameObject
+    public class SnakeSegment(Vector2 position) : GameObject(position)
     {
         private const int CellsSize = 20; // Taille des cellules du serpent
-        public SnakeSegment(Vector2 position) : base(position)
-        {
-        }
+
         public override void Update(float deltaTime)
         {
         }
