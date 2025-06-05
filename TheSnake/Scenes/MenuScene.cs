@@ -1,16 +1,13 @@
 ﻿using Raylib_cs;
-using System.Numerics;
-using TheSnake.Core;
 
 namespace TheSnake.Scenes
 {
     public class MenuScene : IScene
     {
-        private int _highscore;
 
         public void Load()
         {
-            _highscore = HighscoreManager.LoadHighscore();
+            
         }
 
         public void Update(float deltaTime)
