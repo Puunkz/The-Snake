@@ -16,6 +16,7 @@ namespace TheSnake.Entities
         public override void Draw()
         {
             Raylib.DrawRectangle((int)(Position.X * CellsSize), (int)(Position.Y * CellsSize), CellsSize, CellsSize, Color.RED);
+            Raylib.DrawRectangleLines((int)(Position.X * CellsSize), (int)(Position.Y * CellsSize), CellsSize, CellsSize, Color.BROWN);
         }
     }
 }

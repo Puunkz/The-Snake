@@ -4,6 +4,7 @@ namespace TheSnake.Scenes
 {
     public class MenuScene : IScene
     {
+
         public void Load()
         {
             
@@ -12,19 +13,15 @@ namespace TheSnake.Scenes
         public void Update(float deltaTime)
         {
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
-            {
                 SceneManager.ChangeScene(new GameScene());
-            }
         }
-        
+
         public void Draw()
         {
-            Raylib.DrawText("Welcome to The Snake!", 200, 200, 40, Color.WHITE);
-            Raylib.DrawText("Press Enter to Start", 200, 300, 20, Color.LIGHTGRAY);
+            Raylib.DrawText("SNAKE GAME", 250, 150, 50, Color.LIME);
+            Raylib.DrawText("Appuie sur ENTER pour commencer", 200, 250, 25, Color.WHITE);
         }
-        
-        public void Unload()
-        {
-        }
+
+        public void Unload() {}
     }
 }
