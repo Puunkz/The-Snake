@@ -14,7 +14,7 @@ namespace TheSnake
         static void Main()
         {
             Raylib.SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE);
-            Raylib.InitWindow(800, 600, "TheSnake");
+            Raylib.InitWindow(1920, 1080, "TheSnake");
             Raylib.SetTargetFPS(60);
             
             _target = Raylib.LoadRenderTexture(VirtualWidth, VirtualHeight);

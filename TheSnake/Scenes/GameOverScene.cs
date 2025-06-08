@@ -10,6 +10,12 @@ namespace TheSnake.Scenes
         public void Load()
         {
             _highscore = HighscoreManager.LoadHighscore();
+
+            if (score > _highscore)
+            {
+                _highscore = score;
+                HighscoreManager.SaveHighscore(_highscore);
+            }
         }
 
         public void Update(float deltaTime)

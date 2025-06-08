@@ -9,10 +9,16 @@ namespace TheSnake.Scenes
     public class GameScene : IScene 
     {
         private readonly List<SnakeSegment> _snake = new(); 
-        private Fruit? _fruit; 
+        private Fruit? _fruit;
+        private Fruit? _specialFruit;
         private Vector2 _direction = new(1, 0); // Direction initiale du serpent (vers la droite)
-        private float _moveTimer = 0f; 
-        private const float MoveInterval = 0.2f; // Intervalle de temps entre les mouvements
+        private float _moveTimer = 0f;
+        private float _moveInterval = MoveIntervalStart;
+        private const float MoveIntervalStart = 0.2f; // Intervalle de temps entre les mouvements
+        private const float MinMoveInterval = 0.05f; // Intervalle minimum de mouvement
+        
+        private float _speedIncreaseTimer = 0f; // Timer pour augmenter la vitesse
+        private const float SpeedIncreaseInterval = 10f; // Intervalle pour augmenter la vitesse
         
         private bool _growNextMove = false;  
         private readonly int _gridWidth = 40; 
@@ -21,6 +27,11 @@ namespace TheSnake.Scenes
 
         private readonly List<Vector2> _obstacles = new(); 
         private int _score = 0; 
+        private int _lastObstacleScore = 0; // Dernier score auquel un obstacle a été ajouté
+        
+        private bool _scoreBoostActive = false; // Indique si le boost de score est actif
+        private float _scoreBoostTimer = 0f;
+        private const float ScoreBoostDuration = 5f; // Durée du boost de score
         
         public void Load() 
         {
@@ -34,22 +45,49 @@ namespace TheSnake.Scenes
                 _inputService = ServiceLocator.Get<IInputService>();
                 _direction = new Vector2(1, 0);
                 _moveTimer = 0f;
+                _moveInterval = MoveIntervalStart;
+                _speedIncreaseTimer = 0f;
+                
                 _growNextMove = false;
-                _score = 0;
-                _obstacles.Clear();
+                _score = 0; // Réinitialise le score
+                _obstacles.Clear(); // Réinitialise les obstacles
+                _scoreBoostActive = false;
+                _scoreBoostTimer = 0f; // Réinitialise le timer du boost de score
 
                 SpawnFruit();
+                _specialFruit = null;
         }
 
         public void Update(float deltaTime)  
         {
-            HandleInput(); 
+            HandleInput(); ; 
             _moveTimer += deltaTime;
+            _speedIncreaseTimer += deltaTime;
+            
+            if (_speedIncreaseTimer >= SpeedIncreaseInterval && _moveInterval > MinMoveInterval) 
+            {
+                _speedIncreaseTimer = 0f;
+                _moveInterval -= 0.01f; // Augmente la vitesse du serpent
+            }
 
-            if (_moveTimer >= MoveInterval) 
+            if (_scoreBoostActive)
+            {
+                _scoreBoostTimer -= deltaTime;
+                if (_scoreBoostTimer <= 0f)
+                {
+                    _scoreBoostActive = false;
+                }
+            }
+
+            if (_moveTimer >= _moveInterval) 
             {
                 _moveTimer = 0f;
                 MoveSnake();
+            }
+            
+            if (_specialFruit == null && Raylib.GetRandomValue(0, 1000) < 1) // 1 chance sur 1000 de générer un fruit spécial
+            {
+                SpawnSpecialFruit();
             }
         }
 
@@ -67,7 +105,20 @@ namespace TheSnake.Scenes
             }
             
             _fruit?.Draw();
-            Raylib.DrawText($"Score: {_snake.Count - 3}", 10, 10, 20, Color.WHITE); // Affiche le score
+
+            if (_specialFruit != null)
+            {
+                Raylib.DrawRectangle((int)(_specialFruit.Position.X * 20), (int)(_specialFruit.Position.Y * 20), 20, 20, Color.GOLD);
+                Raylib.DrawRectangleLines((int)(_specialFruit.Position.X * 20), (int)(_specialFruit.Position.Y * 20), 20, 20, Color.ORANGE);
+            }
+            
+            string scoreText = $"Score: {_score}";
+            if (_scoreBoostActive)
+                scoreText += " (x2)";
+            Raylib.DrawText(scoreText, 10, 10, 20, Color.WHITE);
+            
+            string pauseText = "Pause = P";
+            Raylib.DrawText(pauseText, 690, 10, 20, Color.WHITE);
         }
 
         public void Unload()
@@ -77,6 +128,7 @@ namespace TheSnake.Scenes
 
         private void HandleInput()
         {
+            if (_inputService == null) return;
             Vector2 inputDir = _inputService.GetDirection();
             if (inputDir != Vector2.Zero)
             {
@@ -92,6 +144,11 @@ namespace TheSnake.Scenes
                 {
                     _direction = inputDir;
                 }
+            }
+
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_P))
+            {
+                SceneManager.PushScene(new PauseScene());
             }
         }
         
@@ -132,24 +189,40 @@ namespace TheSnake.Scenes
                 _snake.RemoveAt(_snake.Count - 1);
             }
 
-            if (newHeadPos == _fruit.Position) // Si le serpent mange le fruit
+            if (newHeadPos == _fruit?.Position) // Si le serpent mange le fruit
             {
                 _growNextMove = true;
-                _score++;
-                if (_score % 5 == 0)
+                _score+= _scoreBoostActive ? 2 : 1; // Double le score si le boost est actif
+                
+                while (_score / 5 > _lastObstacleScore / 5)
                 {
                     AddRandomObstacle();
+                    _lastObstacleScore += 5;
                 }
                 SpawnFruit();
             }
+
+            if (_specialFruit != null && newHeadPos == _specialFruit.Position)
+            {
+                _growNextMove = true; // Le serpent grandit lorsqu'il mange le fruit spécial
+                _score += _scoreBoostActive ? 10 : 5; // Double le score si le boost est actif
+                _scoreBoostActive = true; // Active le boost de score
+                _scoreBoostTimer = ScoreBoostDuration; // Réinitialise le timer du boost de score
+                _specialFruit = null; // Supprime le fruit spécial après l'avoir mangé
+                
+                while (_score / 5 > _lastObstacleScore / 5)
+                {
+                    AddRandomObstacle();
+                    _lastObstacleScore += 5;
+                }
+            }
         }
 
-        private void SpawnFruit() 
+        private void SpawnFruit() // Génère une position aléatoire pour le fruit
         {
             Random rnd = new();
             Vector2 pos;
             
-            // Génère une position aléatoire pour le fruit
             do
             {
                 pos = new Vector2(rnd.Next(0, _gridWidth), rnd.Next(0, _gridHeight));
@@ -159,6 +232,20 @@ namespace TheSnake.Scenes
             _fruit = new Fruit(pos);
         }
 
+        private void SpawnSpecialFruit() // Génère un fruit spécial
+        {
+            Random rnd = new();
+            Vector2 pos;
+
+            do
+            {
+                pos = new Vector2(rnd.Next(0, _gridWidth), rnd.Next(0, _gridHeight));
+            }
+            while (IsPositionOnSnake(pos) || _obstacles.Contains(pos) || (_fruit != null && pos == _fruit.Position));
+
+            _specialFruit = new Fruit(pos);
+        }
+        
         private void AddRandomObstacle() // Ajoute un obstacle aléatoire sur la grille
         {
             Random rnd = new();
@@ -168,7 +255,7 @@ namespace TheSnake.Scenes
             {
                 pos = new Vector2(rnd.Next(0, _gridWidth), rnd.Next(0, _gridHeight));
             }
-            while (IsPositionOnSnake(pos) || pos == _fruit.Position || _obstacles.Contains(pos)); // Assure que l'obstacle n'est pas sur le serpent, le fruit ou déjà un obstacle
+            while (IsPositionOnSnake(pos) || pos == _fruit?.Position || _obstacles.Contains(pos)); // Assure que l'obstacle n'est pas sur le serpent, le fruit ou déjà un obstacle
             
             _obstacles.Add(pos);
         }
