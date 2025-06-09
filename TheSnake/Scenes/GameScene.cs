@@ -64,7 +64,7 @@ namespace TheSnake.Scenes
             _moveTimer += deltaTime;
             _speedIncreaseTimer += deltaTime;
             
-            if (_speedIncreaseTimer >= SpeedIncreaseInterval && _moveInterval > MinMoveInterval) 
+            if (_speedIncreaseTimer >= SpeedIncreaseInterval && _moveInterval > MinMoveInterval) // verifie si le timer est fini et que l'intervalle de mouvement n'est pas déjà au minimum
             {
                 _speedIncreaseTimer = 0f;
                 _moveInterval -= 0.01f; // Augmente la vitesse du serpent
