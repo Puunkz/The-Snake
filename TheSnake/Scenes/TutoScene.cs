@@ -1,9 +1,8 @@
 using Raylib_cs;
-using TheSnake.Core;
 
 namespace TheSnake.Scenes
 {
-    public class TutoScene : IScene
+    public class TutorialScene : IScene
     {
         public void Load()
         {

@@ -13,7 +13,7 @@ namespace TheSnake.Scenes
         public void Update(float deltaTime)
         {
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
-                SceneManager.ChangeScene(new TutoScene());
+                SceneManager.ChangeScene(new TutorialScene());
         }
 
         public void Draw()

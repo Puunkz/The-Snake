@@ -12,32 +12,31 @@ namespace TheSnake.Scenes
         private Fruit? _fruit;
         private Fruit? _specialFruit;
         private Vector2 _direction = new(1, 0); // Direction initiale du serpent (vers la droite)
-        private float _moveTimer = 0f;
+        private readonly Queue<Vector2> _directionQueue = new(); // Queue pour gérer les changements de direction
+        
+        private float _moveTimer;
         private float _moveInterval = MoveIntervalStart;
         private const float MoveIntervalStart = 0.2f; // Intervalle de temps entre les mouvements
         private const float MinMoveInterval = 0.05f; // Intervalle minimum de mouvement
         
-        private float _speedIncreaseTimer = 0f; // Timer pour augmenter la vitesse
-        private const float SpeedIncreaseInterval = 10f; // Intervalle pour augmenter la vitesse
-        
-        private bool _growNextMove = false;  
+        private bool _growNextMove;  
         private readonly int _gridWidth = 40; 
         private readonly int _gridHeight = 30;
         private IInputService? _inputService; 
 
         private readonly List<Vector2> _obstacles = new(); 
-        private int _score = 0; 
-        private int _lastObstacleScore = 0; // Dernier score auquel un obstacle a été ajouté
+        private int _score; 
+        private int _lastObstacleScore; // Dernier score auquel un obstacle a été ajouté
         
-        private bool _scoreBoostActive = false; // Indique si le boost de score est actif
-        private float _scoreBoostTimer = 0f;
+        private bool _scoreBoostActive; // Indique si le boost de score est actif
+        private float _scoreBoostTimer;
         private const float ScoreBoostDuration = 5f; // Durée du boost de score
         
         public void Load() 
         {
                 _snake.Clear(); 
 
-                var headPos = new Vector2(_gridWidth / 2, _gridHeight / 2);
+                var headPos = new Vector2(_gridWidth / 2f, _gridHeight / 2f); // Position initiale du serpent au centre de la grille
                 _snake.Add(new SnakeSegment(headPos));
                 _snake.Add(new SnakeSegment(headPos - new Vector2(1, 0)));
                 _snake.Add(new SnakeSegment(headPos - new Vector2(2, 0)));
@@ -46,7 +45,6 @@ namespace TheSnake.Scenes
                 _direction = new Vector2(1, 0);
                 _moveTimer = 0f;
                 _moveInterval = MoveIntervalStart;
-                _speedIncreaseTimer = 0f;
                 
                 _growNextMove = false;
                 _score = 0; // Réinitialise le score
@@ -60,15 +58,8 @@ namespace TheSnake.Scenes
 
         public void Update(float deltaTime)  
         {
-            HandleInput(); ; 
+            HandleInput();
             _moveTimer += deltaTime;
-            _speedIncreaseTimer += deltaTime;
-            
-            if (_speedIncreaseTimer >= SpeedIncreaseInterval && _moveInterval > MinMoveInterval) // verifie si le timer est fini et que l'intervalle de mouvement n'est pas déjà au minimum
-            {
-                _speedIncreaseTimer = 0f;
-                _moveInterval -= 0.01f; // Augmente la vitesse du serpent
-            }
 
             if (_scoreBoostActive)
             {
@@ -117,6 +108,12 @@ namespace TheSnake.Scenes
                 scoreText += " (x2)";
             Raylib.DrawText(scoreText, 10, 10, 20, Color.WHITE);
             
+            float speedPercentage = 1f - (_moveInterval - MinMoveInterval) / (MoveIntervalStart - MinMoveInterval);
+            speedPercentage = Math.Clamp(speedPercentage, 0f, 1f); // Assure que la vitesse est entre 0 et 1 (Math.Clamp pour limiter la valeur)
+
+            string speedText = $"Speed: {(int)(speedPercentage * 100)}%";
+            Raylib.DrawText(speedText, 10, 40, 20, Color.WHITE);
+            
             string pauseText = "Pause = P";
             Raylib.DrawText(pauseText, 690, 10, 20, Color.WHITE);
         }
@@ -129,20 +126,17 @@ namespace TheSnake.Scenes
         private void HandleInput()
         {
             if (_inputService == null) return;
+            
             Vector2 inputDir = _inputService.GetDirection();
             if (inputDir != Vector2.Zero)
             {
-                if (_snake.Count > 1)
+                Vector2 lastDir = _directionQueue.Count > 0 ? _directionQueue.Last() : _direction;
+                if (inputDir != lastDir)
                 {
-                    Vector2 opposite = -_direction;
-                    if (inputDir != opposite)
+                    if (_directionQueue.Count == 0 || _directionQueue.Last() != inputDir)
                     {
-                        _direction = inputDir;
+                        _directionQueue.Enqueue(inputDir);
                     }
-                }
-                else
-                {
-                    _direction = inputDir;
                 }
             }
 
@@ -154,6 +148,15 @@ namespace TheSnake.Scenes
         
         private void MoveSnake()
         {
+            if (_directionQueue.Count > 0)
+            {
+                Vector2 nextDir = _directionQueue.Dequeue();
+                if (nextDir != -_direction) // Empêche le serpent de se retourner sur lui-même
+                {
+                    _direction = nextDir;
+                }
+            }
+            
             Vector2 newHeadPos = _snake[0].Position + _direction; 
         
             if (newHeadPos.X < 0 ) newHeadPos.X = _gridWidth - 1;
@@ -193,6 +196,7 @@ namespace TheSnake.Scenes
             {
                 _growNextMove = true;
                 _score+= _scoreBoostActive ? 2 : 1; // Double le score si le boost est actif
+                IncreaseSpeed(0.002f);
                 
                 while (_score / 5 > _lastObstacleScore / 5)
                 {
@@ -209,6 +213,7 @@ namespace TheSnake.Scenes
                 _scoreBoostActive = true; // Active le boost de score
                 _scoreBoostTimer = ScoreBoostDuration; // Réinitialise le timer du boost de score
                 _specialFruit = null; // Supprime le fruit spécial après l'avoir mangé
+                IncreaseSpeed(0.01f); // Augmente la vitesse du serpent
                 
                 while (_score / 5 > _lastObstacleScore / 5)
                 {
@@ -269,7 +274,10 @@ namespace TheSnake.Scenes
             return false;
         }
 
-        public int CurrentScore => _score;
+        private void IncreaseSpeed(float amount)
+        {
+            _moveInterval = MathF.Max(_moveInterval - amount, MinMoveInterval); // Assure que l'intervalle de mouvement ne descend pas en dessous du minimum (MathF car float) 
+        }
     }
 }
 
