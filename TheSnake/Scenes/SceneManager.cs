@@ -3,7 +3,7 @@
     public static class SceneManager
     {
         private static IScene? _currentScene;
-        private static readonly Stack<IScene> _sceneStack = new();
+        private static readonly Stack<IScene> SceneStack = new();
         
         public static void ChangeScene(IScene newScene)
         {
@@ -16,7 +16,7 @@
         {
             if (_currentScene != null)
             {
-                _sceneStack.Push(_currentScene);
+                SceneStack.Push(_currentScene);
             }
             
             _currentScene = newScene;
@@ -27,9 +27,9 @@
         {
             _currentScene?.Unload();
             
-            if (_sceneStack.Count > 0)
+            if (SceneStack.Count > 0)
             {
-                _currentScene = _sceneStack.Pop();
+                _currentScene = SceneStack.Pop();
             }
         }
         
@@ -45,9 +45,9 @@
 
         public static void DrawUnderlyingScenes()
         {
-            if (_sceneStack.Count > 0)
+            if (SceneStack.Count > 0)
             {
-                var underlyingScenes = _sceneStack.Peek();
+                var underlyingScenes = SceneStack.Peek();
                 underlyingScenes.Draw();
             }
         }
