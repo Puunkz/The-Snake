@@ -27,6 +27,6 @@ test-results/
 # Ignorer les fichiers de configuration de Visual Studio Code
 .vscode/
 # Ignorer les fichiers de configuration de JetBrains Rider
-.idea/
+.idea/.idea.TheSnake.dir/
 
 
