@@ -20,7 +20,11 @@ config/
 docs/
 # Ignorer les fichiers de test
 test-results/
-*.idea
-bin
-Debug
-net9.0
+# Ignorer les fichiers de configuration de l'IDE
+*.suo
+# Ignorer les fichiers de configuration de Visual Studio
+*.user
+# Ignorer les fichiers de configuration de Visual Studio Code
+.vscode/
+# Ignorer les fichiers de configuration de JetBrains Rider
+.idea/
