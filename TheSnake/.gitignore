@@ -1,0 +1,26 @@
+# Ignorer tous les fichiers .log
+*.log
+# Ignorer les fichiers temporaires de l'éditeur
+*.tmp
+# Ignorer les fichiers de configuration de l'éditeur
+*.editorconfig
+# Ignorer les fichiers de sauvegarde
+*~
+# Ignorer les fichiers de cache
+.cache
+# Ignorer les fichiers de build
+build/
+# Ignorer les fichiers de dépendances
+node_modules/
+# Ignorer les fichiers de logs de l'application
+app-logs/
+# Ignorer les fichiers de configuration de l'application
+config/
+# Ignorer les fichiers de documentation générée
+docs/
+# Ignorer les fichiers de test
+test-results/
+*.idea
+bin
+Debug
+net9.0
