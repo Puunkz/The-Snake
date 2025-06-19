@@ -4,10 +4,7 @@ namespace TheSnake.Scenes
 {
     public class PauseScene : IScene
     {
-        public void Load()
-        {
-            
-        }
+        public void Load() {}
 
         public void Update(float deltaTIme)
         {
@@ -36,9 +33,6 @@ namespace TheSnake.Scenes
             Raylib.DrawText("Appuie sur Q pour quitter le jeu", 200, 400, 25, Color.WHITE);
         }
 
-        public void Unload()
-        {
-            
-        }
+        public void Unload() {}
     }
 }

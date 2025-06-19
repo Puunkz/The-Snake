@@ -5,10 +5,7 @@ namespace TheSnake.Scenes
     public class MenuScene : IScene
     {
 
-        public void Load()
-        {
-            
-        }
+        public void Load() {}
 
         public void Update(float deltaTime)
         {

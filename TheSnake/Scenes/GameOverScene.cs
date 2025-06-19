@@ -32,6 +32,6 @@ namespace TheSnake.Scenes
             Raylib.DrawText("Appuie sur ENTER pour recommencer", 200, 350, 20, Color.GRAY);
         }
 
-        public void Unload() { }
+        public void Unload() {}
     }
 }

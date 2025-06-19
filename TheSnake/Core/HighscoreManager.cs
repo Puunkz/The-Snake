@@ -6,7 +6,7 @@ namespace TheSnake.Core
 
         public static int LoadHighscore()
         {
-            if(!File.Exists(HighscoreFilePath))
+            if(!File.Exists(HighscoreFilePath)) // Check si le fichier existe
                 return 0;
             
             var content = File.ReadAllText(HighscoreFilePath);

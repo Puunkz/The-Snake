@@ -4,10 +4,7 @@ namespace TheSnake.Scenes
 {
     public class TutorialScene : IScene
     {
-        public void Load()
-        {
-            
-        }
+        public void Load() {}
 
         public void Update(float deltaTime)
         {
@@ -41,6 +38,6 @@ namespace TheSnake.Scenes
 
             Raylib.DrawText("Appuie sur ESPACE pour commencer", 200, 400, 25, Color.LIGHTGRAY);
         }
-        public void Unload(){}
+        public void Unload() {}
     }
 }

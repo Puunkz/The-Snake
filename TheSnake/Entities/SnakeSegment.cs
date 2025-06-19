@@ -8,9 +8,7 @@ namespace TheSnake.Entities
     {
         private const int CellsSize = 20; // Taille des cellules du serpent
 
-        public override void Update(float deltaTime)
-        {
-        }
+        public override void Update(float deltaTime) {}
 
         public override void Draw()
         {
